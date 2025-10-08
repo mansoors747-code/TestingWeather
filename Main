@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather App 🌦️</title>
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(120deg, #00c6ff, #0072ff);
+    color: #fff;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+  }
+
+  .container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+
+  input {
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    width: 80%;
+    text-align: center;
+  }
+
+  button {
+    background: #fff;
+    color: #0072ff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 5px;
+  }
+
+  button:hover {
+    background: #e0e0e0;
+  }
+
+  #weatherInfo {
+    margin-top: 20px;
+  }
+
+  .temp {
+    font-size: 2em;
+    font-weight: bold;
+  }
+
+  .desc {
+    font-size: 1.2em;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>🌦️ Weather App</h2>
+  <input type="text" id="cityInput" placeholder="Enter city name">
+  <div>
+    <button id="checkWeather">Check Weather</button>
+    <button id="clearWeather">Clear</button>
+  </div>
+  <div id="weatherInfo"></div>
+</div>
+
+<script>
+const apiKey = "1f2946dbcd0c4f6eb1960750250810";
+
+const cityInput = document.getElementById("cityInput");
+const checkWeatherBtn = document.getElementById("checkWeather");
+const clearWeatherBtn = document.getElementById("clearWeather");
+const weatherInfo = document.getElementById("weatherInfo");
+
+// Fetch weather data
+function getWeather() {
+  const city = cityInput.value.trim();
+  weatherInfo.innerHTML = ""; // clear previous info
+
+  if (!city) {
+    weatherInfo.innerHTML = "<p>Please enter a city name.</p>";
+    return;
+  }
+
+  weatherInfo.innerHTML = "<p>Loading...</p>";
+
+  fetch(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`)
+    .then(res => {
+      if (!res.ok) throw new Error("City not found");
+      return res.json();
+    })
+    .then(data => {
+      const { location, current } = data;
+      weatherInfo.innerHTML = `
+        <h3>${location.name}, ${location.country}</h3>
+        <p class="temp">${current.temp_c}°C</p>
+        <p class="desc">${current.condition.text}</p>
+        <img src="${current.condition.icon}" alt="${current.condition.text}">
+      `;
+    })
+    .catch(err => {
+      weatherInfo.innerHTML = `<p>⚠️ ${err.message}. Try again!</p>`;
+    });
+}
+
+// Clear input and weather info
+function clearWeather() {
+  cityInput.value = "";
+  weatherInfo.innerHTML = "";
+}
+
+// Event listeners
+checkWeatherBtn.addEventListener("click", getWeather);
+clearWeatherBtn.addEventListener("click", clearWeather);
+cityInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") getWeather();
+});
+</script>
+
+</body>
+</html>
